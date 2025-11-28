@@ -278,6 +278,11 @@ body {
    RESPONSIVE
    ==================================== */
 @media (max-width: 768px) {
+  /* Layout general en columna */
+  .dashboard-with-sidebar {
+    flex-direction: column;
+  }
+
   /* Sidebar oculto por defecto en móvil */
   .sidebar {
     position: fixed;
@@ -302,21 +307,69 @@ body {
     justify-content: center;
   }
 
+  /* Contenido principal más compacto en móvil */
   .main-content {
     margin-left: 0;
-    padding: 20px;
+    padding: 16px;
   }
 
+  .container {
+    padding: 10px;
+  }
+
+  /* Resumen del día: menos padding y margen */
+  .resumen-card {
+    padding: 18px 16px;
+    margin: 12px 0 18px 0;
+  }
+
+  .resumen-card h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .resumen-card input[type="date"] {
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  /* Cards COBRA / DESCANSA más pequeñas y en columna */
   .cards-row {
     flex-direction: column;
+    gap: 16px;
+    margin: 16px 0 20px 0;
+  }
+
+  .cards-row .card {
+    max-width: 100%;
+    padding: 10px 12px;
+    border-radius: 18px;
+  }
+
+  .card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .nombre-grande {
+    font-size: 22px;
+    margin: 8px 0;
+  }
+
+  /* Asistencia más compacta en móvil */
+  .asistencia-card {
+    padding: 22px 16px;
+    border-radius: 18px;
+    margin-top: 18px;
   }
 
   .asistencia-table th,
   .asistencia-table td {
-    padding: 10px;
-    font-size: 14px;
+    padding: 8px;
+    font-size: 13px;
   }
 }
+
 
 
 .alert {
@@ -515,4 +568,70 @@ body {
 .sidebar a.active {
   background: #00ff88;
   color: #000;
+}
+
+
+/* ====================================
+   TOPBAR PARA MOBILE / GENERAL
+   ==================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #2c3e50;
+  color: #fff;
+}
+
+.topbar-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Botón menú hamburguesa */
+.sidebar-toggle {
+  display: none; /* se muestra solo en móvil */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.sidebar-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  margin: 3px 0;
+  border-radius: 999px;
+}
+
+/* Overlay cuando menú está abierto */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 900;
+}
+
+.sidebar-overlay.show {
+  display: block;
+}
+
+/* link activo del menú */
+.sidebar a.active {
+  background: #00ff88;
+  color: #000;
+}
+
+/* Forzar que el botón de menú aparezca en ventanas angostas */
+@media (max-width: 900px) {
+  .sidebar-toggle {
+    display: inline-flex !important;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
