@@ -1,0 +1,308 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-with-sidebar">
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="container">
+
+      <!-- FEEDBACK DE GUARDADO / ERROR -->
+      <% if (typeof mensajeExito !== 'undefined' && mensajeExito) { %>
+        <div class="alert alert-exito">
+          <%= mensajeExito %>
+        </div>
+      <% } %>
+
+      <% if (typeof mensajeError !== 'undefined' && mensajeError) { %>
+        <div class="alert alert-error">
+          <%= mensajeError %>
+        </div>
+      <% } %>
+
+      <!-- RESUMEN DEL DIA -->
+      <div class="resumen-card">
+        <h2>Resumen del día</h2>
+        <form action="/dashboard" method="GET" style="display:inline;">
+          <input type="date" name="fecha" value="<%= fechaSeleccionada %>" onchange="this.form.submit()">
+        </form>
+        <p><strong><%= diaSemana %></strong> - <%= fechaFormateada %></p>
+      </div>
+
+      <!-- FILA DE CARDS -->
+      <div class="cards-row">
+        <div class="card verde">
+          <h3>Cobra Hoy</h3>
+          <% if (cobraHoy.length > 0) { cobraHoy.forEach(e => { %>
+            <p class="nombre-grande"><%= e.nombre %></p>
+            <small>$<%= e.salarioSemanal %> semanal</small>
+          <% })} else { %><p>Nadie cobra hoy</p><% } %>
+        </div>
+        <div class="card amarillo">
+          <h3>Descansa Hoy</h3>
+          <% if (descansaHoy.length > 0) { descansaHoy.forEach(e => { %>
+            <p class="nombre-grande"><%= e.nombre %></p>
+          <% })} else { %><p>Todos trabajan</p><% } %>
+        </div>
+      </div>
+
+      <!-- ASISTENCIA DIARIA -->
+      <div class="asistencia-card">
+        <h2>Asistencia Diaria - <%= diaSemana %> <%= fechaFormateada %></h2>
+
+        <form action="/asistencia/guardar" method="POST">
+          <input type="hidden" name="fecha" value="<%= fechaSeleccionada %>">
+
+          <div class="table-container">
+            <table class="asistencia-table">
+                <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Turno</th>
+                    <th>Llegó</th>
+                    <th>Salida</th>
+                    <th>Adelanto ($)</th>
+                    <th>Horas</th>
+                    <th>Extras</th>
+                    <th>Falta</th>
+                </tr>
+                </thead>
+
+              <tbody>
+                <% const asistencias = asistenciaPorEmpleado || {}; %>
+
+                <% empleados.forEach((emp, index) => { %>
+                  <% 
+                    const esDescanso = emp.diaDescanso === diaActual;
+                    const asistencia = asistencias[emp._id.toString()];
+                    const rowClasses = [];
+                    if (esDescanso) rowClasses.push('descanso');
+                    if (asistencia && asistencia.falta) rowClasses.push('falta');
+                  %>
+
+                  <tr class="<%= rowClasses.join(' ') %>">
+                    <td><strong><%= emp.nombre %></strong></td>
+                    
+                    <!-- TURNO -->
+                    <td>
+                      <select name="turno_<%= index %>" onchange="aplicarTurno(this, '<%= index %>')">
+                        <option value="" <%= !asistencia || !asistencia.turno ? 'selected' : '' %>>Turno</option>
+                        <option value="08:00-16:00" <%= asistencia && asistencia.turno === '08:00-16:00' ? 'selected' : '' %>>
+                          8:00am - 4:00pm
+                        </option>
+                        <option value="11:30-19:30" <%= asistencia && asistencia.turno === '11:30-19:30' ? 'selected' : '' %>>
+                          11:30am - 7:30pm
+                        </option>
+                        <option value="13:00-21:00" <%= asistencia && asistencia.turno === '13:00-21:00' ? 'selected' : '' %>>
+                          1:00pm - 9:00pm
+                        </option>
+                        <option value="personalizado" <%= asistencia && asistencia.turno === 'personalizado' ? 'selected' : '' %>>
+                          Personalizado
+                        </option>
+                      </select>
+                    </td>
+
+                    <!-- LLEGADA -->
+                    <td>
+                      <input
+                        type="time"
+                        name="llegada_<%= index %>"
+                        class="hora-llegada"
+                        value="<%= asistencia && asistencia.llegada ? asistencia.llegada : '' %>"
+                        onchange="actualizarHorasExtras('<%= index %>')"
+                      >
+                    </td>
+
+                    <!-- SALIDA -->
+                    <td>
+                      <input
+                        type="time"
+                        name="salida_<%= index %>"
+                        class="hora-salida"
+                        value="<%= asistencia && asistencia.salida ? asistencia.salida : '' %>"
+                        onchange="actualizarHorasExtras('<%= index %>')"
+                      >
+                    </td>
+
+                    <!-- ADELANTO -->
+                    <td>
+                      <input
+                        type="number"
+                        name="adelanto_<%= index %>"
+                        min="0"
+                        value="<%= asistencia && typeof asistencia.adelanto === 'number' ? asistencia.adelanto : 0 %>"
+                      >
+                    </td>
+
+                    <!-- HORAS -->
+                    <td>
+                        <input
+                        type="number"
+                        name="horas_<%= index %>"
+                        class="input-horas"
+                        value="0"
+                        readonly
+                        data-descanso="<%= esDescanso ? '1' : '0' %>"
+                        >
+                    </td>
+
+                    <!-- EXTRAS -->
+                    <td>
+                      <input
+                        type="number"
+                        name="extras_<%= index %>"
+                        min="0"
+                        value="<%= asistencia && typeof asistencia.extras === 'number' ? asistencia.extras : 0 %>"
+                      >
+                    </td>
+
+                    <!-- FALTA -->
+                    <td style="text-align:center;">
+                      <input
+                        type="checkbox"
+                        name="falta_<%= index %>"
+                        onchange="marcarFalta(this, '<%= index %>')"
+                        <%= esDescanso ? 'disabled' : '' %>
+                        <%= asistencia && asistencia.falta ? 'checked' : '' %>
+                      >
+                    </td>
+                    
+                  </tr>
+                  <input type="hidden" name="empleado_id_<%= index %>" value="<%= emp._id %>">
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+          <button type="submit" class="btn-guardar-todo">Guardar Toda la Asistencia del Día</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .alert {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+  }
+
+  .alert-exito {
+    background-color: #e6ffed;
+    border: 1px solid #2ecc71;
+    color: #145a32;
+  }
+
+  .alert-error {
+    background-color: #ffe6e6;
+    border: 1px solid #e74c3c;
+    color: #7b241c;
+  }
+</style>
+
+<script>
+function aplicarTurno(select, index) {
+  const inputLlegada = document.querySelector(`input[name="llegada_${index}"]`);
+  const inputSalida  = document.querySelector(`input[name="salida_${index}"]`);
+  const inputHoras   = document.querySelector(`input[name="horas_${index}"]`);
+
+  if (!inputLlegada || !inputSalida || !inputHoras) return;
+
+  // Si es un turno fijo, rellenamos automáticamente entrada/salida
+  if (select.value && select.value !== "personalizado") {
+    const [llegada, salida] = select.value.split("-");
+    inputLlegada.value = llegada || "";
+    inputSalida.value  = salida  || "";
+    inputLlegada.readOnly = true;
+    inputSalida.readOnly  = true;
+  } else {
+    // Turno vacío o personalizado: el usuario puede editar libremente
+    inputLlegada.readOnly = false;
+    inputSalida.readOnly  = false;
+  }
+
+  // Siempre recalculamos horas y extras con los valores actuales
+  actualizarHorasExtras(index);
+}
+
+function actualizarHorasExtras(index) {
+  const inputLlegada = document.querySelector(`input[name="llegada_${index}"]`);
+  const inputSalida  = document.querySelector(`input[name="salida_${index}"]`);
+  const inputHoras   = document.querySelector(`input[name="horas_${index}"]`);
+  const inputExtras  = document.querySelector(`input[name="extras_${index}"]`);
+
+  if (!inputLlegada || !inputSalida || !inputHoras || !inputExtras) return;
+
+  const esDescanso = inputHoras.dataset.descanso === "1";
+  const llegada = inputLlegada.value;
+  const salida  = inputSalida.value;
+
+  // Si no hay horas capturadas aún, dejamos todo en 0
+  if (!llegada || !salida) {
+    inputHoras.value  = 0;
+    inputExtras.value = 0;
+    return;
+  }
+
+  const [lh, lm] = llegada.split(":").map(Number);
+  const [sh, sm] = salida.split(":").map(Number);
+
+  let minutos = (sh * 60 + sm) - (lh * 60 + lm);
+  if (isNaN(minutos) || minutos <= 0) {
+    inputHoras.value  = 0;
+    inputExtras.value = 0;
+    return;
+  }
+
+  let horasTrabajadas = minutos / 60;
+  horasTrabajadas = Math.round(horasTrabajadas * 100) / 100; // 2 decimales
+
+  if (esDescanso) {
+    // DÍA DE DESCANSO:
+    // Todo lo que trabaje se considera HORAS EXTRA
+    inputHoras.value  = 0;
+    inputExtras.value = horasTrabajadas;
+  } else {
+    // DÍA NORMAL:
+    // Hasta 8 horas van a HORAS, el resto a EXTRAS
+    if (horasTrabajadas <= 8) {
+      inputHoras.value  = horasTrabajadas;
+      inputExtras.value = 0;
+    } else {
+      inputHoras.value  = 8;
+      inputExtras.value = Math.round((horasTrabajadas - 8) * 100) / 100;
+    }
+  }
+}
+
+function marcarFalta(checkbox, index) {
+  const fila = checkbox.closest('tr');
+  const horasInput  = document.querySelector(`input[name="horas_${index}"]`);
+  const extrasInput = document.querySelector(`input[name="extras_${index}"]`);
+
+  if (checkbox.checked) {
+    fila.classList.add('falta');
+    if (horasInput)  horasInput.value  = "0";
+    if (extrasInput) extrasInput.value = "0";
+  } else {
+    fila.classList.remove('falta');
+    // Quitamos falta → recalculamos con base en las horas capturadas
+    actualizarHorasExtras(index);
+  }
+}
+
+// Al cargar la página, recalculamos horas y extras para TODAS las filas
+document.addEventListener('DOMContentLoaded', () => {
+  const horasInputs = document.querySelectorAll('input[name^="horas_"]');
+  horasInputs.forEach(input => {
+    const index = input.name.split("_")[1];
+    actualizarHorasExtras(index);
+  });
+});
+</script>
+
+
+
+<%- include('partials/footer') %>

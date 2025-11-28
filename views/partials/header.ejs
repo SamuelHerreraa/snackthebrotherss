@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnackTheBrothers</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<% if (user) { %>
+  <!-- SIDEBAR SOLO SI ESTÁ LOGUEADO -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>SnackTheBrothers</h2>
+      <p><%= user.email %></p>
+    </div>
+<nav>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/nomina">Nomina / Reportes</a>   <!-- 👈 NUEVO -->
+  <a href="/empleados">Gestion de Empleados</a>
+  <a href="/auth/logout" style="background:#c0392b;">Cerrar Sesion</a>
+</nav>
+
+  </div>
+<% } %>
+
+<div class="<%= user ? 'main-content-with-sidebar' : 'main-content-full' %>">

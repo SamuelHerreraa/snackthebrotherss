@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <h1>Iniciar Sesión</h1>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="success"><%= success %></div>
+  <% } %>
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <form action="/auth/login" method="POST">
+    <input type="email" name="email" placeholder="Email" required autofocus>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <button type="submit">Entrar</button>
+  </form>
+
+  <p>¿No tienes cuenta? <a href="/auth/register">Regístrate aquí</a></p>
+</div>
+
+<%- include('partials/footer') %>

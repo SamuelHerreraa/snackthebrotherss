@@ -1,0 +1,143 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-with-sidebar">
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="container">
+
+      <!-- ENCABEZADO BONITO -->
+      <div class="resumen-card empleados-header">
+        <h2>Gestión de Empleados</h2>
+        <p>Administra los empleados, su día de pago, día de descanso y salario semanal.</p>
+        <p style="margin-top:10px; font-size:14px; opacity:0.8;">
+          Empleados registrados: <strong><%= empleados.length %></strong>
+        </p>
+      </div>
+
+      <!-- CARD: AGREGAR EMPLEADO -->
+      <div class="empleados-card">
+        <div class="empleados-card-header">
+          <h3>Agregar empleado</h3>
+          <p class="empleados-card-subtitle">Completa los datos para registrar un nuevo colaborador.</p>
+        </div>
+
+        <form action="/empleados" method="POST" class="empleado-form">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" name="nombre" placeholder="Ej. MIA" required>
+          </div>
+
+          <div class="form-group">
+            <label>Día de pago</label>
+            <select name="diaPago" required>
+              <option value="">Selecciona...</option>
+              <option>Lunes</option>
+              <option>Martes</option>
+              <option>Miercoles</option>
+              <option>Jueves</option>
+              <option>Viernes</option>
+              <option>Sabado</option>
+              <option>Domingo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Día de descanso</label>
+            <select name="diaDescanso" required>
+              <option value="">Selecciona...</option>
+              <option>Lunes</option>
+              <option>Martes</option>
+              <option>Miercoles</option>
+              <option>Jueves</option>
+              <option>Viernes</option>
+              <option>Sabado</option>
+              <option>Domingo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Salario semanal ($)</label>
+            <input type="number" name="salarioSemanal" placeholder="Ej. 1350" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label>Celular (opcional)</label>
+            <input type="text" name="celular" placeholder="Ej. 899 123 45 67">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-guardar">Guardar empleado</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CARD: LISTA DE EMPLEADOS -->
+      <div class="empleados-card empleados-list-card">
+        <div class="empleados-card-header-between">
+          <h3>Lista de empleados</h3>
+          <span class="empleados-count">
+            Total: <strong><%= empleados.length %></strong>
+          </span>
+        </div>
+
+        <% if (empleados.length === 0) { %>
+          <p style="margin-top:15px;">No hay empleados registrados aún.</p>
+        <% } else { %>
+          <div class="table-container">
+            <table class="asistencia-table empleados-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Día pago</th>
+                  <th>Día descanso</th>
+                  <th>Salario semanal</th>
+                  <th>Ganancia por día</th>
+                  <th>Ganancia por hora</th>
+                  <th>Celular</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                        <%
+                        // 7 días de sueldo (incluye descanso), pero solo 6 días se trabajan
+                        const diasPorSemana = 7;
+                        const horasPorDia = 8;
+                        const horasSemanaEstandar = 6 * horasPorDia; // 48 horas trabajadas
+                        %>
+
+                        <% empleados.forEach(emp => { %>
+                        <%
+                            const porDia = (emp.salarioSemanal / diasPorSemana).toFixed(2);
+                            const porHora = (emp.salarioSemanal / horasSemanaEstandar).toFixed(2);
+                        %>
+
+                  <tr>
+                    <td><strong><%= emp.nombre %></strong></td>
+                    <td><%= emp.diaPago %></td>
+                    <td><%= emp.diaDescanso %></td>
+                    <td>$<%= emp.salarioSemanal %></td>
+                    <td>$<%= porDia %></td>
+                    <td>$<%= porHora %></td>
+                    <td><%= emp.celular || '-' %></td>
+                    <td>
+                      <a href="/empleados/editar/<%= emp._id %>" class="link-accion link-editar">Editar</a>
+                      <a href="/empleados/eliminar/<%= emp._id %>"
+                         class="link-accion link-eliminar"
+                         onclick="return confirm('Seguro que quieres eliminar a <%= emp.nombre %>?')">
+                        Eliminar
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

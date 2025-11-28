@@ -1,0 +1,64 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-with-sidebar">
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="container">
+
+      <div class="empleados-card">
+        <div class="empleados-card-header-between">
+          <h3>Editar empleado</h3>
+          <a href="/empleados" class="btn-link-volver">← Volver a la lista</a>
+        </div>
+        <p class="empleados-card-subtitle">
+          Modifica la información de <strong><%= empleado.nombre %></strong>.
+        </p>
+
+        <form action="/empleados/editar/<%= empleado._id %>" method="POST" class="empleado-form">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" name="nombre" value="<%= empleado.nombre %>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Día de pago</label>
+            <select name="diaPago" required>
+              <option value="">Selecciona...</option>
+              <% ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'].forEach(d => { %>
+                <option <%= empleado.diaPago === d ? 'selected' : '' %>><%= d %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Día de descanso</label>
+            <select name="diaDescanso" required>
+              <option value="">Selecciona...</option>
+              <% ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'].forEach(d => { %>
+                <option <%= empleado.diaDescanso === d ? 'selected' : '' %>><%= d %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Salario semanal ($)</label>
+            <input type="number" name="salarioSemanal" value="<%= empleado.salarioSemanal %>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Celular (opcional)</label>
+            <input type="text" name="celular" value="<%= empleado.celular %>" placeholder="Celular (opcional)">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-guardar">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

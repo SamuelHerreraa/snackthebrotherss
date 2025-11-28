@@ -1,0 +1,434 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* ====================================
+   LAYOUT GENERAL
+   ==================================== */
+.dashboard-with-sidebar {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  background: #f4f4f4;
+}
+
+/* ====================================
+   SIDEBAR
+   ==================================== */
+.sidebar {
+  width: 280px;
+  background: #2c3e50;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 999;
+  box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+}
+
+.sidebar h2 {
+  font-size: 24px;
+  color: #00ff88;
+  margin-bottom: 10px;
+}
+
+.sidebar p {
+  margin-bottom: 40px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 15px;
+  background: #34495e;
+  color: white;
+  text-decoration: none;
+  margin: 10px 0;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+
+.sidebar a:hover {
+  background: #00ff88;
+  color: black;
+}
+
+.sidebar a[style*="background:#c0392b"],
+.sidebar a[href="/auth/logout"] {
+  background: #c0392b !important;
+}
+
+.sidebar a[href="/auth/logout"]:hover {
+  background: #e74c3c !important;
+}
+
+/* ====================================
+   CONTENEDORES PRINCIPALES
+   ==================================== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ====================================
+   RESUMEN DEL DÍA
+   ==================================== */
+.resumen-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  margin-bottom: 40px;
+}
+
+.resumen-card h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.resumen-card input[type="date"] {
+  padding: 12px;
+  font-size: 18px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+/* ====================================
+   CARDS COBRA HOY / DESCANSA HOY
+   ==================================== */
+.cards-row {
+  display: flex;
+  gap: 40px;
+  margin: 40px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cards-row .card {
+  flex: 1;
+  min-width: 160px;
+  max-width: 520px;
+  padding: 5px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  transition: transform 0.4s;
+}
+
+.cards-row .card:hover {
+  transform: translateY(-15px);
+}
+
+.card.verde {
+  background: linear-gradient(135deg, #00ff88, #00cc70);
+  color: black;
+}
+
+.card.amarillo {
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
+  color: white;
+}
+
+.card h3 {
+  font-size: 26px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.nombre-grande {
+  font-size: 34px;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+/* ====================================
+   ASISTENCIA DIARIA
+   ==================================== */
+.asistencia-card {
+  background: white;
+  padding: 40px;
+  border-radius: 25px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+  margin-top: 50px;
+}
+
+.asistencia-card h2 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.asistencia-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 16px;
+  background: white;
+}
+
+.asistencia-table th {
+  background: #2c3e50;
+  color: white;
+  padding: 18px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.asistencia-table td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.asistencia-table input,
+.asistencia-table select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 15px;
+}
+
+.asistencia-table .input-horas {
+  background: #f8f9fa;
+  font-weight: bold;
+  color: #27ae60;
+  text-align: center;
+}
+
+.asistencia-table tr.descanso td {
+  background: #fff8e1 !important;
+  color: #f39c12;
+}
+
+.asistencia-table tr.falta td {
+  background: #fee !important;
+  color: #c0392b;
+}
+
+.descanso-tag {
+  background: #f39c12;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.btn-guardar {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-guardar-todo {
+  display: block;
+  margin: 40px auto 0;
+  padding: 18px 70px;
+  font-size: 20px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(39,174,96,0.3);
+}
+
+.btn-guardar-todo:hover,
+.btn-guardar:hover {
+  background: #219653;
+  transform: translateY(-3px);
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    transform: translateX(-100%);
+    transition: 0.3s;
+    z-index: 1000;
+  }
+  .sidebar.active { transform: translateX(0); }
+  .main-content { margin-left: 0; padding: 20px; }
+  .cards-row { flex-direction: column; }
+  .asistencia-table th,
+  .asistencia-table td { padding: 10px; font-size: 14px; }
+}
+
+.alert {
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.alert-exito {
+  background-color: #e6ffed;
+  border: 1px solid #2ecc71;
+  color: #145a32;
+}
+
+.alert-error {
+  background-color: #ffe6e6;
+  border: 1px solid #e74c3c;
+  color: #7b241c;
+}
+
+/* ====================================
+   EMPLEADOS
+   ==================================== */
+
+.empleados-header {
+  text-align: left;
+}
+
+.empleados-header h2 {
+  margin-bottom: 10px;
+}
+
+.empleados-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+  margin-top: 25px;
+}
+
+.empleados-card-header,
+.empleados-card-header-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.empleados-card-header h3,
+.empleados-card-header-between h3 {
+  font-size: 22px;
+  color: #2c3e50;
+}
+
+.empleados-card-subtitle {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+.empleados-count {
+  font-size: 14px;
+  color: #555;
+  background: #ecf0f1;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.empleado-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px 20px;
+  margin-top: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #555;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #27ae60;
+  background: #ffffff;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  text-align: right;
+  margin-top: 5px;
+}
+
+.empleados-table th,
+.empleados-table td {
+  font-size: 14px;
+}
+
+.link-accion {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 4px;
+}
+
+.link-editar {
+  color: #27ae60;
+}
+
+.link-eliminar {
+  color: #c0392b;
+}
+
+.link-accion:hover {
+  text-decoration: underline;
+}
+
+.btn-link-volver {
+  font-size: 14px;
+  color: #3498db;
+  text-decoration: none;
+}
+
+.btn-link-volver:hover {
+  text-decoration: underline;
+}

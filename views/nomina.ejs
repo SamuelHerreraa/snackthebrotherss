@@ -1,0 +1,398 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-with-sidebar">
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="container">
+
+      <!-- FILTROS DE SEMANA -->
+      <div class="resumen-card">
+        <h2>Nómina y Reportes</h2>
+        <form method="GET" action="/nomina" class="filtros-nomina">
+          <div class="filtro-fecha">
+            <label>Del</label>
+            <input type="date" name="inicio" value="<%= fechaInicioInput %>">
+          </div>
+          <div class="filtro-fecha">
+            <label>Al</label>
+            <input type="date" name="fin" value="<%= fechaFinInput %>">
+          </div>
+          <button type="submit" class="btn-aplicar">Aplicar</button>
+        </form>
+        <p style="margin-top:10px;"><strong><%= etiquetaSemana %></strong></p>
+      </div>
+
+      <!-- ================= CORTE DE PAGO ================= -->
+      <div class="asistencia-card nomina-card">
+        <h2>Corte de pago</h2>
+
+        <form method="GET" action="/nomina" class="filtros-nomina" style="margin-bottom:10px;">
+          <!-- Conservamos los filtros de semana y la vista actual -->
+          <input type="hidden" name="inicio" value="<%= fechaInicioInput %>">
+          <input type="hidden" name="fin" value="<%= fechaFinInput %>">
+          <input type="hidden" name="view" value="<%= view %>">
+
+          <div class="filtro-fecha">
+            <label>Fecha de corte</label>
+            <input type="date" name="corteFecha" value="<%= corteFechaInput %>">
+          </div>
+
+          <button type="submit" class="btn-aplicar">Aplicar</button>
+        </form>
+
+        <p style="margin-bottom:10px;">
+          Corte al día: <strong><%= corteFechaTexto %></strong>
+        </p>
+
+
+        <div class="table-container">
+          <table class="asistencia-table report-table">
+<thead>
+  <tr>
+    <th>Empleado</th>
+    <th>Inicio</th>
+    <th>Fin</th>
+    <th>Horas</th>
+    <th>Extras</th>
+    <th>Adelantos<br><small>(con fecha y día)</small></th>
+    <th>Faltas<br><small>(con fecha y día)</small></th>
+    <th>Total a Pagar</th>
+  </tr>
+</thead>
+
+
+<tbody>
+  <% cortePagoEmpleados.forEach(c => { %>
+    <!-- Fila principal -->
+    <tr>
+      <td><strong><%= c.nombre %></strong></td>
+      <td><%= c.inicioTexto %></td>
+      <td><%= c.finTexto %></td>
+      <td><%= c.horas %></td>
+      <td><%= c.extras %></td>
+      <td>
+        $<%= c.adelantos.toFixed(2) %>
+        <% if (c.adelantosDetalle && c.adelantosDetalle.length > 0) { %>
+          <ul class="detalle-lista">
+            <% c.adelantosDetalle.forEach(d => { %>
+              <li><%= d.fecha %> — $<%= d.monto.toFixed(2) %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </td>
+      <td>
+        <%= c.faltas %>
+        <% if (c.faltasDetalle && c.faltasDetalle.length > 0) { %>
+          <ul class="detalle-lista">
+            <% c.faltasDetalle.forEach(d => { %>
+              <li><%= d.fecha %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </td>
+      <td><strong>$<%= c.totalPagar.toFixed(2) %></strong></td>
+    </tr>
+
+    <!-- Segunda fila: DETALLE DEL CÁLCULO -->
+    <tr class="fila-detalle-corte">
+      <td></td>
+      <td colspan="7">
+        <div class="detalle-corte-linea">
+          <strong>Detalle:</strong>
+          <span>
+            Horas normales (<%= c.horas %> h) → $<%= c.pagoHoras.toFixed(2) %>
+            <% if (c.horas && c.horas > 0) { %>
+              &nbsp;(@ $<%= (c.pagoHoras / c.horas).toFixed(2) %>/h)
+            <% } %>
+          </span>
+        </div>
+
+        <div class="detalle-corte-linea">
+          <span>
+            Horas extras (<%= c.extras %> h) → $<%= c.pagoExtras.toFixed(2) %>
+            <% if (c.extras && c.extras > 0) { %>
+              &nbsp;(@ $<%= (c.pagoExtras / c.extras).toFixed(2) %>/h)
+            <% } %>
+          </span>
+        </div>
+
+        <div class="detalle-corte-linea">
+          <span>Descuento por faltas: -$<%= c.descuentoFaltas.toFixed(2) %></span>
+          <span style="margin-left:16px;">Adelantos: -$<%= c.adelantos.toFixed(2) %></span>
+          <span style="margin-left:16px;">
+            <strong>Total neto: $<%= c.totalPagar.toFixed(2) %></strong>
+          </span>
+        </div>
+      </td>
+    </tr>
+  <% }) %>
+</tbody>
+
+
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= TABS ================= -->
+      <div class="tabs-nomina">
+        <a href="/nomina?inicio=<%= fechaInicioInput %>&fin=<%= fechaFinInput %>&view=nomina&corteFecha=<%= corteFechaInput %>"
+           class="<%= view === 'nomina' ? 'active' : '' %>">
+          Nómina semanal
+        </a>
+        <a href="/nomina?inicio=<%= fechaInicioInput %>&fin=<%= fechaFinInput %>&view=resumen&corteFecha=<%= corteFechaInput %>"
+           class="<%= view === 'resumen' ? 'active' : '' %>">
+          Resumen de asistencia
+        </a>
+        <a href="/nomina?inicio=<%= fechaInicioInput %>&fin=<%= fechaFinInput %>&view=historial&corteFecha=<%= corteFechaInput %>"
+           class="<%= view === 'historial' ? 'active' : '' %>">
+          Historial por empleado
+        </a>
+      </div>
+
+
+      <!-- TAB 1: NÓMINA SEMANAL -->
+      <% if (view === 'nomina') { %>
+        <div class="asistencia-card nomina-card">
+          <h2>Nómina semanal por empleado</h2>
+
+          <div class="table-container">
+            <table class="asistencia-table report-table">
+              <thead>
+                <tr>
+                  <th>Empleado</th>
+                  <th>Horas</th>
+                  <th>Extras</th>
+                  <th>Adelantos</th>
+                  <th>Faltas</th>
+                  <th>Pago Horas</th>
+                  <th>Pago Extras</th>
+                  <th>Desc. Adelantos</th>
+                  <th>Desc. Faltas</th>
+                  <th>Total a Pagar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% resumenNomina.forEach(r => { %>
+                  <tr>
+                    <td><strong><%= r.nombre %></strong></td>
+                    <td><%= r.horas %></td>
+                    <td><%= r.extras %></td>
+                    <td>$<%= r.adelantos.toFixed(2) %></td>
+                    <td><%= r.faltas %></td>
+                    <td>$<%= r.pagoHoras.toFixed(2) %></td>
+                    <td>$<%= r.pagoExtras.toFixed(2) %></td>
+                    <td>-$<%= r.descuentoAdelantos.toFixed(2) %></td>
+                    <td>-$<%= r.descuentoFaltas.toFixed(2) %></td>
+                    <td><strong>$<%= r.totalPagar.toFixed(2) %></strong></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- TAB 2: RESUMEN DE ASISTENCIA -->
+      <% if (view === 'resumen') { %>
+        <div class="asistencia-card nomina-card">
+          <h2>Resumen de asistencia semanal</h2>
+
+          <div class="table-container">
+            <table class="asistencia-table report-table">
+              <thead>
+                <tr>
+                  <th>Empleado</th>
+                  <th>Horas totales</th>
+                  <th>Horas extra</th>
+                  <th>Adelantos</th>
+                  <th>Faltas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% resumenNomina.forEach(r => { %>
+                  <tr>
+                    <td><strong><%= r.nombre %></strong></td>
+                    <td><%= r.horas %></td>
+                    <td><%= r.extras %></td>
+                    <td>$<%= r.adelantos.toFixed(2) %></td>
+                    <td><%= r.faltas %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- TAB 3: HISTORIAL POR EMPLEADO -->
+      <% if (view === 'historial') { %>
+        <div class="asistencia-card nomina-card">
+          <h2>Historial por empleado</h2>
+
+          <form method="GET" action="/nomina" class="historial-filtros">
+            <input type="hidden" name="inicio" value="<%= fechaInicioInput %>">
+            <input type="hidden" name="fin" value="<%= fechaFinInput %>">
+            <input type="hidden" name="view" value="historial">
+
+            <label>Empleado:</label>
+            <select name="empleadoId" onchange="this.form.submit()">
+              <option value="">Selecciona un empleado</option>
+              <% empleados.forEach(e => { %>
+                <option value="<%= e._id %>"
+                  <%= empleadoSeleccionadoId === e._id.toString() ? 'selected' : '' %>>
+                  <%= e.nombre %>
+                </option>
+              <% }) %>
+            </select>
+          </form>
+
+          <% if (!empleadoSeleccionadoId) { %>
+            <p style="margin-top:20px;">Selecciona un empleado para ver su historial.</p>
+          <% } else if (historialEmpleado.length === 0) { %>
+            <p style="margin-top:20px;">No hay registros de asistencia para este empleado en esta semana.</p>
+          <% } else { %>
+            <p style="margin-top:10px;">
+              Historial de <strong><%= empleadoSeleccionadoNombre %></strong>
+              — <%= etiquetaSemana %>
+            </p>
+
+            <div class="table-container">
+              <table class="asistencia-table report-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Turno</th>
+                    <th>Llegada</th>
+                    <th>Salida</th>
+                    <th>Horas</th>
+                    <th>Extras</th>
+                    <th>Adelanto</th>
+                    <th>Falta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% historialEmpleado.forEach(h => { %>
+                    <tr class="<%= h.falta ? 'falta' : '' %>">
+                      <td><%= h.fechaTexto %></td>
+                      <td><%= h.turno %></td>
+                      <td><%= h.llegada %></td>
+                      <td><%= h.salida %></td>
+                      <td><%= h.horas %></td>
+                      <td><%= h.extras %></td>
+                      <td>$<%= h.adelanto.toFixed(2) %></td>
+                      <td><%= h.falta ? 'Sí' : 'No' %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .filtros-nomina {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+
+  .filtro-fecha label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+  }
+
+  .filtro-fecha input[type="date"] {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .btn-aplicar {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: #27ae60;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .tabs-nomina {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .tabs-nomina a {
+    padding: 10px 18px;
+    border-radius: 20px;
+    background: #ecf0f1;
+    color: #34495e;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .tabs-nomina a.active {
+    background: #27ae60;
+    color: white;
+  }
+
+  .nomina-card {
+    margin-top: 25px;
+  }
+
+  .report-table th, .report-table td {
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  .detalle-lista {
+    list-style: none;
+    padding-left: 0;
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: #555;
+  }
+
+  .historial-filtros {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .historial-filtros select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+    .fila-detalle-corte td {
+    background: #fafafa;
+    font-size: 13px;
+    border-top: none;
+  }
+
+  .detalle-corte-linea {
+    margin-top: 3px;
+  }
+
+  .detalle-corte-linea span {
+    display: inline-block;
+  }
+
+
+</style>
+
+<%- include('partials/footer') %>
