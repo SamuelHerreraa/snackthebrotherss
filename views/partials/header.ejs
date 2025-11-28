@@ -2,27 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <title>Snack The Brothers</title>
+
+  <!-- Para que se vea bien en iPhone / móvil -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SnackTheBrothers</title>
+
+  <!-- Tu CSS original -->
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-<% if (user) { %>
-  <!-- SIDEBAR SOLO SI ESTÁ LOGUEADO -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>SnackTheBrothers</h2>
-      <p><%= user.email %></p>
-    </div>
-<nav>
-  <a href="/dashboard">Dashboard</a>
-  <a href="/nomina">Nomina / Reportes</a>   <!-- 👈 NUEVO -->
-  <a href="/empleados">Gestion de Empleados</a>
-  <a href="/auth/logout" style="background:#c0392b;">Cerrar Sesion</a>
-</nav>
-
+  <!-- Barra superior (para botón de menú en móvil) -->
+  <div class="topbar">
+    <div class="topbar-title">Snack The Brothers</div>
+    <button class="sidebar-toggle" type="button" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
-<% } %>
 
-<div class="<%= user ? 'main-content-with-sidebar' : 'main-content-full' %>">
+  <!-- Overlay para cuando el sidebar está abierto en móvil -->
+  <div class="sidebar-overlay"></div>

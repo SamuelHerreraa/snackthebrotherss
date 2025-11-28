@@ -1,13 +1,40 @@
 <div class="sidebar">
-  <div class="sidebar-header">
-    <h2>SnackTheBrothers</h2>
-    <p><%= user && user.email ? user.email : '' %></p>
-  </div>
-<nav>
-  <a href="/dashboard">Dashboard</a>
-  <a href="/nomina">Nomina / Reportes</a>
-  <a href="/empleados">Gestion de Empleados</a>
-  <a href="/auth/logout" style="background:#c0392b;">Cerrar Sesion</a>
-</nav>
+  <h2>Snack The Brothers</h2>
+  <p>Panel de control</p>
 
+  <ul class="sidebar-nav">
+    <li>
+      <a href="/dashboard"
+         class="<%= (typeof activePage !== 'undefined' && activePage === 'dashboard') ? 'active' : '' %>">
+        Dashboard
+      </a>
+    </li>
+
+    <li>
+      <a href="/empleados"
+         class="<%= (typeof activePage !== 'undefined' && activePage === 'empleados') ? 'active' : '' %>">
+        Empleados
+      </a>
+    </li>
+
+    <li>
+      <a href="/asistencia"
+         class="<%= (typeof activePage !== 'undefined' && activePage === 'asistencia') ? 'active' : '' %>">
+        Asistencia
+      </a>
+    </li>
+
+    <li>
+      <a href="/nomina"
+         class="<%= (typeof activePage !== 'undefined' && activePage === 'nomina') ? 'active' : '' %>">
+        Nómina
+      </a>
+    </li>
+
+    <li>
+      <a href="/auth/logout">
+        Cerrar sesión
+      </a>
+    </li>
+  </ul>
 </div>

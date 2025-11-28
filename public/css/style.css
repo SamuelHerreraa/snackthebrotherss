@@ -278,18 +278,46 @@ body {
    RESPONSIVE
    ==================================== */
 @media (max-width: 768px) {
+  /* Sidebar oculto por defecto en móvil */
   .sidebar {
     position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
     transform: translateX(-100%);
     transition: 0.3s;
     z-index: 1000;
   }
-  .sidebar.active { transform: translateX(0); }
-  .main-content { margin-left: 0; padding: 20px; }
-  .cards-row { flex-direction: column; }
+
+  /* Lo mostramos cuando JS agrega la clase .open (o .active por compatibilidad) */
+  .sidebar.open,
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  /* Topbar visible y botón hamburguesa */
+  .sidebar-toggle {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .cards-row {
+    flex-direction: column;
+  }
+
   .asistencia-table th,
-  .asistencia-table td { padding: 10px; font-size: 14px; }
+  .asistencia-table td {
+    padding: 10px;
+    font-size: 14px;
+  }
 }
+
 
 .alert {
   padding: 10px 15px;
@@ -431,4 +459,60 @@ body {
 
 .btn-link-volver:hover {
   text-decoration: underline;
+}
+
+/* ====================================
+   TOPBAR PARA MÓVIL / GENERAL
+   ==================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #2c3e50;
+  color: #fff;
+}
+
+.topbar-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Botón de menú (tres rayitas) */
+.sidebar-toggle {
+  display: none; /* se mostrará solo en móvil */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.sidebar-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  margin: 3px 0;
+  border-radius: 999px;
+}
+
+/* Overlay oscuro cuando el menú está abierto en móvil */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 900;
+}
+
+.sidebar-overlay.show {
+  display: block;
+}
+
+/* Link activo en el sidebar */
+.sidebar a.active {
+  background: #00ff88;
+  color: #000;
 }

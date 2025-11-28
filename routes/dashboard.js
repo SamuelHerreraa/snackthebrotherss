@@ -68,21 +68,22 @@ router.get('/', requireLogin, async (req, res) => {
       asistenciaPorEmpleado[a.empleado.toString()] = a;
     });
 
-    // ====== RENDER ======
-    res.render('dashboard', {
-      user: req.session.user,
-      fechaSeleccionada,
-      diaSemana,
-      fechaFormateada,
-      cobraHoy,
-      descansaHoy,
-      empleados,
-      diaActual,
-      turnos,
-      mensajeExito,
-      mensajeError,
-      asistenciaPorEmpleado
-    });
+res.render('dashboard', {
+  user: req.session.user,
+  fechaSeleccionada,
+  diaSemana,
+  fechaFormateada,
+  cobraHoy,
+  descansaHoy,
+  empleados,
+  diaActual,
+  turnos,
+  mensajeExito,
+  mensajeError,
+  asistenciaPorEmpleado,
+  activePage: 'dashboard'
+});
+
 
   } catch (err) {
     console.error('Error en dashboard:', err);
