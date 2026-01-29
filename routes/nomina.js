@@ -30,6 +30,37 @@ function formatoDiaYFecha(date) {
   return date.toLocaleDateString('es-ES', opts);
 }
 
+// Normaliza un Date a inicio de día LOCAL
+function startOfDayLocal(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+// Días en español (getDay: 0=Dom..6=Sab)
+const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+
+function descansoPorPago(diaPago) {
+  const idx = DIAS.indexOf(diaPago);
+  if (idx === -1) return 'Domingo';
+  return DIAS[(idx + 1) % 7];
+}
+
+// Obtiene el día de pago que aplica a una fecha (por historial schedules).
+// Obtiene el día de pago vigente para una fecha dada usando historial (schedules).
+function diaPagoVigente(emp, fechaLocal) {
+  const schedules = Array.isArray(emp.schedules) ? emp.schedules : [];
+  if (schedules.length === 0) return emp.diaPago;
+
+  const target = startOfDayLocal(fechaLocal);
+  // Tomar el último effectiveFrom <= target
+  let elegido = null;
+  for (const s of schedules) {
+    if (!s || !s.effectiveFrom || !s.diaPago) continue;
+    const eff = startOfDayLocal(new Date(s.effectiveFrom));
+    if (eff <= target) elegido = s;
+  }
+  return (elegido && elegido.diaPago) ? elegido.diaPago : emp.diaPago;
+}
+
 router.get('/', requireLogin, async (req, res) => {
   try {
     let { inicio, fin, view, empleadoId, corteFecha } = req.query;
@@ -86,9 +117,7 @@ router.get('/', requireLogin, async (req, res) => {
 
 
 
-    const diasSemanaNombres = [
-      'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
+    const diasSemanaNombres = DIAS;
 
     // ====== RESUMEN NÓMINA (SEMANA DE FILTRO) ======
     const resumenNomina = empleados.map(emp => {
@@ -190,18 +219,28 @@ router.get('/', requireLogin, async (req, res) => {
     const cortePagoEmpleados = [];
 
     for (const emp of empleados) {
-      // Solo empleados cuyo día de pago coincide con la fecha de corte seleccionada
-      if (emp.diaPago !== nombreDiaCorte) continue;
+      // Solo empleados cuyo día de pago VIGENTE coincide con la fecha de corte seleccionada
+      const diaPagoEmp = diaPagoVigente(emp, corteSinHora);
+      if (diaPagoEmp !== nombreDiaCorte) continue;
 
       // 2) Fin del corte = día anterior a la fecha de corte (no se paga el mismo día)
       const finCorte = new Date(corteSinHora);
       finCorte.setDate(corteSinHora.getDate() - 1);
       finCorte.setHours(23, 59, 59, 999);
 
-      // 3) Inicio del corte = 6 días antes del fin → semana completa (7 días)
-      const inicioCorte = new Date(finCorte);
-      inicioCorte.setDate(finCorte.getDate() - 6);
-      inicioCorte.setHours(0, 0, 0, 0);
+      // 3) Inicio del corte (tu regla): 7 días previos al día de pago.
+      //    Ej: paga Lunes 19 → se paga del Lunes 12 al Domingo 18.
+      let inicioCorte = new Date(corteSinHora);
+      inicioCorte.setDate(inicioCorte.getDate() - 7);
+      inicioCorte = startOfDayLocal(inicioCorte);
+
+      // Respetar fechaIngreso (no contar nada antes de que exista el empleado)
+      if (emp.fechaIngreso) {
+        const base = startOfDayLocal(new Date(emp.fechaIngreso));
+        if (inicioCorte < base) inicioCorte = base;
+      }
+
+      const diaDescansoVigente = descansoPorPago(diaPagoEmp);
 
       // 4) Buscar asistencia de ese periodo
       const registros = await Asistencia.find({
@@ -233,7 +272,7 @@ router.get('/', requireLogin, async (req, res) => {
             let horasTrabajadas = minutos / 60;
             horasTrabajadas = Math.round(horasTrabajadas * 100) / 100;
 
-            if (emp.diaDescanso === diaNombreReg) {
+            if (diaDescansoVigente === diaNombreReg) {
               // Día de descanso → todo a extras
               horasCalc = 0;
               extrasCalc = horasTrabajadas;

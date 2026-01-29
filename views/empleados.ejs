@@ -9,7 +9,7 @@
       <!-- ENCABEZADO BONITO -->
       <div class="resumen-card empleados-header">
         <h2>Gestión de Empleados</h2>
-        <p>Administra los empleados, su día de pago, día de descanso y salario semanal.</p>
+        <p>Administra los empleados, su día de pago y salario semanal. (El descanso se calcula automáticamente: se descansa el día después del pago.)</p>
         <p style="margin-top:10px; font-size:14px; opacity:0.8;">
           Empleados registrados: <strong><%= empleados.length %></strong>
         </p>
@@ -43,17 +43,11 @@
           </div>
 
           <div class="form-group">
-            <label>Día de descanso</label>
-            <select name="diaDescanso" required>
-              <option value="">Selecciona...</option>
-              <option>Lunes</option>
-              <option>Martes</option>
-              <option>Miercoles</option>
-              <option>Jueves</option>
-              <option>Viernes</option>
-              <option>Sabado</option>
-              <option>Domingo</option>
-            </select>
+            <label>Fecha de ingreso (alta)</label>
+            <input type="date" name="fechaIngreso" required>
+            <small style="opacity:0.75; display:block; margin-top:6px;">
+              Se usa solo para que el sistema no cuente semanas antes de que el empleado existiera.
+            </small>
           </div>
 
           <div class="form-group">
@@ -90,7 +84,8 @@
                 <tr>
                   <th>Nombre</th>
                   <th>Día pago</th>
-                  <th>Día descanso</th>
+                  <th>Fecha ingreso</th>
+                  <th>Día descanso (auto)</th>
                   <th>Salario semanal</th>
                   <th>Ganancia por día</th>
                   <th>Ganancia por hora</th>
@@ -115,12 +110,20 @@
                   <tr>
                     <td><strong><%= emp.nombre %></strong></td>
                     <td><%= emp.diaPago %></td>
+                    <td>
+                      <% if (emp.fechaIngreso) { %>
+                        <%= new Date(emp.fechaIngreso).toISOString().slice(0,10) %>
+                      <% } else { %>
+                        -
+                      <% } %>
+                    </td>
                     <td><%= emp.diaDescanso %></td>
                     <td>$<%= emp.salarioSemanal %></td>
                     <td>$<%= porDia %></td>
                     <td>$<%= porHora %></td>
                     <td><%= emp.celular || '-' %></td>
                     <td>
+                      <a href="/empleados/semana/<%= emp._id %>" class="link-accion">Semana</a>
                       <a href="/empleados/editar/<%= emp._id %>" class="link-accion link-editar">Editar</a>
                       <a href="/empleados/eliminar/<%= emp._id %>"
                          class="link-accion link-eliminar"

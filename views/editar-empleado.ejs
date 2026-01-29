@@ -32,13 +32,37 @@
           </div>
 
           <div class="form-group">
-            <label>Día de descanso</label>
-            <select name="diaDescanso" required>
-              <option value="">Selecciona...</option>
-              <% ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'].forEach(d => { %>
-                <option <%= empleado.diaDescanso === d ? 'selected' : '' %>><%= d %></option>
-              <% }) %>
-            </select>
+            <label>Fecha de ingreso (alta)</label>
+            <input
+              type="date"
+              name="fechaIngreso"
+              value="<%= empleado.fechaIngreso ? new Date(empleado.fechaIngreso).toISOString().slice(0,10) : '' %>"
+              required
+            >
+            <small style="opacity:0.75; display:block; margin-top:6px;">
+              Se usa para evitar que la nómina cuente periodos antes de que el empleado existiera.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Día de descanso (auto)</label>
+            <input type="text" value="<%= empleado.diaDescanso %>" disabled>
+            <small style="opacity:0.75; display:block; margin-top:6px;">
+              Regla del negocio: se descansa el día después del día de pago.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Aplicar cambio de día de pago desde (opcional)</label>
+            <input
+              type="date"
+              name="effectiveFromSchedule"
+              value="<%= new Date().toISOString().slice(0,10) %>"
+            >
+            <small style="opacity:0.75; display:block; margin-top:6px;">
+              Si cambias el día de pago, esta fecha guarda un historial para no afectar nóminas pasadas.
+              Si no quieres historial, borra la fecha.
+            </small>
           </div>
 
           <div class="form-group">

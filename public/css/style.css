@@ -635,3 +635,125 @@ body {
     justify-content: center;
   }
 }
+
+/* =============================
+   Semana del empleado
+   ============================= */
+.semana-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.semana-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.semana-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.semana-date-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.semana-date-form label {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.semana-date-form input[type="date"] {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+}
+
+.semana-table td {
+  vertical-align: middle;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.12);
+  opacity: 0.85;
+}
+
+.badge-descanso {
+  background: rgba(0, 255, 136, 0.12);
+  border-color: rgba(0, 255, 136, 0.25);
+}
+
+.semana-row-descanso {
+  background: rgba(0, 255, 136, 0.08);
+}
+
+.semana-row-disabled {
+  opacity: 0.55;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,255,136,0.35);
+}
+
+.resumen-totales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.resumen-item {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.resumen-item span {
+  display: block;
+  opacity: 0.75;
+  font-size: 13px;
+}
+
+.resumen-item strong {
+  display: block;
+  font-size: 20px;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .semana-date-form {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

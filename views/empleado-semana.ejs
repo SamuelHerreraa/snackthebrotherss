@@ -1,0 +1,150 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-with-sidebar">
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="container">
+
+      <div class="resumen-card empleados-header">
+        <div class="semana-header-row">
+          <div>
+            <h2>Semana de <%= empleado.nombre %></h2>
+            <p style="margin:0; opacity:0.85;">
+              Día de pago: <strong><%= diaPago %></strong> · Descanso: <strong><%= diaDescanso %></strong>
+            </p>
+            <p style="margin-top:8px; font-size:14px; opacity:0.75;">
+              <%= rango.etiqueta %>
+            </p>
+          </div>
+
+          <div class="semana-header-actions">
+            <a class="btn-secondary" href="/empleados">← Volver</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="empleados-card">
+        <div class="semana-nav">
+          <a class="btn-secondary" href="/empleados/semana/<%= empleado._id %>?payDate=<%= nav.prevPayDate %>">← Semana anterior</a>
+
+          <form class="semana-date-form" action="/empleados/semana/<%= empleado._id %>" method="GET">
+            <label>Pago</label>
+            <input type="date" name="payDate" value="<%= new Date(payDate).toISOString().slice(0,10) %>">
+            <button type="submit" class="btn-guardar">Ir</button>
+          </form>
+
+          <a class="btn-secondary" href="/empleados/semana/<%= empleado._id %>?payDate=<%= nav.nextPayDate %>">Semana siguiente →</a>
+        </div>
+
+        <div class="table-container" style="margin-top:16px;">
+          <table class="asistencia-table empleados-table semana-table">
+            <thead>
+              <tr>
+                <th>Día</th>
+                <th>Turno</th>
+                <th>Llegó</th>
+                <th>Salida</th>
+                <th>Adelanto</th>
+                <th>Horas</th>
+                <th>Extras</th>
+                <th>Falta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% dias.forEach(d => { %>
+                <%
+                  const a = d.asistencia;
+                  const rowClass = d.antesDeIngreso ? 'semana-row-disabled' : (d.esDescanso ? 'semana-row-descanso' : '');
+                %>
+                <tr class="<%= rowClass %>">
+                  <td>
+                    <strong><%= d.etiqueta %></strong>
+                    <% if (d.esDescanso) { %>
+                      <span class="badge badge-descanso">DESCANSO</span>
+                    <% } %>
+                    <% if (d.antesDeIngreso) { %>
+                      <span class="badge">Antes de ingreso</span>
+                    <% } %>
+                  </td>
+                  <td><%= a ? (a.turno || '-') : '-' %></td>
+                  <td><%= a ? (a.llegada || '-') : '-' %></td>
+                  <td><%= a ? (a.salida || '-') : '-' %></td>
+                  <td>$<%= a ? (a.adelanto || 0) : 0 %></td>
+                  <td><%= a ? (a.horas || 0) : 0 %></td>
+                  <td><%= a ? (a.extras || 0) : 0 %></td>
+                  <td style="text-align:center;"><%= a && a.falta ? '✔' : '' %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="resumen-grid" style="margin-top:16px;">
+        <div class="resumen-card">
+          <div class="resumen-card">
+  <h3 style="margin-top:0;">Pago del corte</h3>
+
+  <div class="resumen-totales">
+    <div class="resumen-item">
+      <span>Pago horas</span>
+      <strong>$<%= pago.pagoHoras %></strong>
+    </div>
+    <div class="resumen-item">
+      <span>Pago extras</span>
+      <strong>$<%= pago.pagoExtras %></strong>
+    </div>
+    <div class="resumen-item">
+      <span>Descuento faltas</span>
+      <strong>-$<%= pago.descuentoFaltas %></strong>
+    </div>
+    <div class="resumen-item">
+      <span>Adelantos</span>
+      <strong>-$<%= pago.descuentoAdelantos %></strong>
+    </div>
+    <div class="resumen-item">
+      <span><strong>Total a pagar</strong></span>
+      <strong style="font-size:20px;">$<%= pago.totalPagar %></strong>
+    </div>
+  </div>
+
+  <p style="margin-top:10px; font-size:13px; opacity:0.75;">
+    Base: $<%= pago.salarioSemanal %>/sem · $<%= pago.salarioDiario %>/día · $<%= pago.salarioHora %>/hora · Extra: $<%= pago.tarifaExtra %>/hora
+  </p>
+</div>
+
+          <h3 style="margin-top:0;">Totales del corte</h3>
+          <div class="resumen-totales">
+            <div class="resumen-item">
+              <span>Horas</span>
+              <strong><%= totales.horas %></strong>
+            </div>
+            <div class="resumen-item">
+              <span>Extras</span>
+              <strong><%= totales.extras %></strong>
+            </div>
+            <div class="resumen-item">
+              <span>Días trabajados</span>
+              <strong><%= totales.diasTrabajados %></strong>
+            </div>
+            <div class="resumen-item">
+              <span>Faltas</span>
+              <strong><%= totales.faltas %></strong>
+            </div>
+            <div class="resumen-item">
+              <span>Adelantos</span>
+              <strong>$<%= totales.adelantos %></strong>
+            </div>
+          </div>
+          <p style="margin-top:10px; font-size:13px; opacity:0.75;">
+            Nota: el <strong>día de pago</strong> (<%= new Date(payDate).toISOString().slice(0,10) %>) no se incluye aquí, se acumula para el siguiente corte.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
